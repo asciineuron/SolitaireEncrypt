@@ -1,0 +1,7 @@
+#include "Card.h"
+
+// deck implemented as doubly linked list for easier swapping etc
+class Deck
+{
+
+};

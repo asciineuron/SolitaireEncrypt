@@ -1,0 +1,285 @@
+#include <iostream>
+#include <cassert> 
+
+enum Suit {Diamond, Heart, Spade, Club, JokerA, JokerB};
+
+class Card
+{
+private:
+  Suit suit;
+  int rank;
+public:
+  Card(Suit suit, int rank)
+    {
+      this->suit = suit;
+      this->rank = rank;
+    }
+  Card(const Card& in)
+  {
+    this->suit = in.suit;
+    this->rank = in.rank;
+  }
+  void print()
+  {
+    std::cout << "Suit: " << this->suit << " rank: " << this->rank << " ";
+  }
+};
+
+class Node
+{
+public:
+  Node* prev;
+  Node* next;
+  Card card;
+  Node(Card inCard, Node* inPrev, Node* inNext):
+    card(inCard), prev(inPrev), next(inNext)
+  {
+  }
+};
+
+// doubly linked list to represent deck
+class DLL
+{
+private:
+  Node* first;
+  Node* last;
+  int size;
+public:
+  DLL()
+  {
+    first = NULL;
+    last = NULL;
+    size = 0;
+  }
+  ~DLL()
+  {
+    Node* del = first;
+    if (del != NULL)
+      {
+	Node* next = first->next;
+	while (next != NULL)
+	  {
+	    // delete from first to last
+	    delete del;
+	    del = next;
+	    next = del->next;
+	  }
+	delete del;
+      }
+  }
+  
+  int getSize()
+  {
+    return this->size;
+  }
+
+  Card value(Node* n)
+  {
+    assert(n != NULL);
+    return n->card;
+  }
+
+  void print()
+  {
+    Node* out = first;
+    int cardNum = 1;
+    while (out != NULL)
+      {
+	std::cout << "Card#" << cardNum++ << " ";
+	out->card.print();
+	out = out->next;
+	std::cout << "\n";
+      }
+  }
+
+  void prepend(Card in)
+  {
+    Node* newNode = new Node(in, NULL, first);
+    first = newNode;
+    if (size == 0)
+      {
+	last = newNode;
+      } else
+      {
+	newNode->next->prev = newNode;
+      }
+      size++;
+    }
+  
+  void append(Card in)
+  {
+    Node* newNode = new Node(in, last, NULL);
+    last = newNode;
+    if (size == 0)
+      {
+	first = newNode;
+      } else
+      {
+	newNode->prev->next = newNode;
+      }
+    size++;
+  }
+  // get node num into list
+  Node* getNode(int num)
+  {
+    assert(num >= 0 && num < size);
+    Node* out = NULL;
+    if (num <= size/2)
+      {
+	out = first;
+	while (num > 0)
+	  {
+	    out = out->next;
+	    num--;
+	  }
+      } else
+      {
+	out = last;
+	while (num < size - 1)
+	  {
+	    out = out->prev;
+	    num++;
+	  }
+      }
+    return out;
+  }
+  /*
+  // swap nodes at positions a and b
+  void swapNodes(int posA, int posB)
+  {
+    assert(posB > posA && posB >= 0 && posB < size && posA >=0 && posA < size);
+    Node* a = this->getNode(posA);
+    Node* b = this->getNode(posB);
+
+    Card tempCard = b->card;
+    Node* tempPrev = b->prev;
+    Node* tempNext = b->next;
+
+    // assume b < a
+    if (posB-posA == 1)
+      {	
+    b->card = a->card;
+    a->card = tempCard;
+    b->prev = a->prev;
+    a->prev = b;
+    b->next = a;
+    a->next = tempNext;
+    
+      } else {
+    b->card = a->card;
+    a->card = tempCard;
+    b->prev = a->prev;
+    a->prev = tempPrev;
+    b->next = a->next;
+    a->next = tempNext;
+    }
+    if (first == a)
+      {
+	first = b;
+      }
+    if (first == b)
+      {
+	first = a;
+      }
+    if (last == a)
+      {
+	last = b;
+      }
+    if (last == b)
+      {
+	last = a;
+      }
+  }
+  *//*
+  void swapNodes(int posA, int posB)
+  {
+    // assume b > a, i.e. later in deck
+    assert(posB > posA && posB >= 0 && posB < size && posA >= 0 && posA < size);
+    Node* a = this->getNode(posA);
+    Node* b = this->getNode(posB);
+    Card tempCard = b->card;
+    Node* tempPrev = b->prev;
+    Node* tempNext = b->next;
+
+    Node*tempNextA = a->next;
+    Node* tempPrevA = a->prev;
+    if (a->prev != NULL)
+      a->prev->next = b;
+    if (b->next != NULL)
+      b->next->prev = a;
+  
+    
+    if (first == a)
+      {
+	first = b;
+      }
+    if (last == b)
+      {
+	last = a;
+      }
+    if (posB - posA == 1) // adjacent
+      {
+	//if (a->prev != NULL)
+	  a->prev = b;
+	  //if (b->next != NULL)
+	  b->next = a;
+      } else
+      {
+	//if (b->next != NULL)
+	b->next = tempNextA;
+	  //if (a->prev != NULL)
+	  a->prev = tempPrev; // i.e. b->prev
+	if (a->next != NULL)
+	  a->next->prev = b;
+	if (b->prev != NULL)
+	  b->prev->next = a;
+      }
+      //if (b->prev != NULL)
+    b->prev = tempPrevA;
+      //if (a->next != NULL)
+      a->next =tempNext;
+      // b->card = a->card;
+      //a->card = tempCard;
+      }*/
+
+  void swapNodes(int posA, int posB)
+  {
+    // assume b > a, i.e. later in deck
+    //assert(posB > posA && posB >= 0 && posB < size && posA >= 0 && posA < size);
+    Node* a = this->getNode(posA);
+    Node* b = this->getNode(posB);
+    Card tempCard = b->card;
+    b->card = a->card;
+    a->card = tempCard;
+  }
+  
+  void genDeck()
+  {
+    // generate all 52+2 cards then shuffle
+    for (int s = 0; s < 4; s++)
+      {
+	for (int r = 1; r <= 13; r++)
+	  {
+	    this->append(Card(static_cast<Suit>(s), r));
+	  }
+      }
+    this->append(Card(static_cast<Suit>(4), 0));
+    this->append(Card(static_cast<Suit>(5), 0));
+  }
+  // now shuffle
+};
+
+int main()
+{
+  DLL d;
+  d.append(Card(Spade, 1));
+  d.append(Card(Club, 2));
+  d.append(Card(Diamond, 5));
+  d.append(Card(Diamond, 3));
+  d.append(Card(Diamond, 8));
+  d.print();
+  std::cout << "---";
+  d.swapNodes(1, 3);
+  d.print();
+  return 0;
+}

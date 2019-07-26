@@ -1,0 +1,14 @@
+#ifndef CARD_H
+#define CARD_H
+
+enum Suit {Diamond, Heart, Spade, Club};
+
+class Card
+{
+ public:
+ private:
+  
+};
+
+
+#endif
